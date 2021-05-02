@@ -6,6 +6,8 @@ Simply git clone, then run `npm install` to install dependencies
 
 Then rename `example.env` to `.env` and edit the values accordingly
 
+Finally run `node server.js`
+
 ###
 
 Early code, don't judge..
