@@ -10,15 +10,6 @@ class LaunchLibrary{
     constructor(url){
         this.url = url
     }
-    async test(){
-        try{
-            var a = 1+2;
-            return "test"+a;
-        }
-        catch(e){
-            throw new Error(e);
-        }
-    }
     async get(path){
         try{
             var cached_data = await redis_client.getAsync(path);
