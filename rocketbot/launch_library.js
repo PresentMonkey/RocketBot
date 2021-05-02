@@ -76,18 +76,33 @@ class LaunchLibrary{
                 return deserialize(cached_data);
             }
             else{
+                var returnValue;
                 let response = await this.get('/launch/upcoming/');
-                let latestLaunch =  response.results[0];
-                let date = new Date(latestLaunch.net)
-                let returnValue = {
-                    embed: {
-                        title: "Next Launch:",
-                        description: "🚀 " + latestLaunch.name + "\n📍 " + latestLaunch.pad.name + ", " + latestLaunch.pad.location.name + "\n🕒  " + date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "long", hour: "numeric", minute: "numeric"}),
-                        footer: {
-                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
+                let goLaunches = response.results.filter(launch => launch.status.name == "Go");
+                if(goLaunches){
+                    let latestLaunch =  goLaunches[0];
+                    let date = new Date(latestLaunch.net)
+                    returnValue = {
+                        embed: {
+                            title: "Next Launch:",
+                            description: "🚀 " + latestLaunch.name + "\n📍 " + latestLaunch.pad.name + ", " + latestLaunch.pad.location.name + "\n🕒  " + date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "long", hour: "numeric", minute: "numeric"}),
+                            footer: {
+                                text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
+                            }
+                        }
+                    };
+                }
+                else{
+                    returnValue = {
+                        embed: {
+                            title: "Next Launch: ",
+                            description: "No Go Launches at this time",
+                            footer: {
+                                text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
+                            }
                         }
                     }
-                };
+                } 
                 redis_client.setex('getNextLaunch', 600, serialize(returnValue));
                 return returnValue;
             }
