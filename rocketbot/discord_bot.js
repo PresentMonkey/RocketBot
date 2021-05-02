@@ -13,24 +13,6 @@ bot.on("ready", ()=>{
     console.log("Ready!");
 });
 
-bot.registerCommand("ping", "Ping!", {
-    description: "Pong!",
-    reactionButtons: [
-        {
-            emoji: "⬅",
-            type: "edit",
-            response: (msg) =>{
-                return msg.content.split().reverse().join();
-            }
-        },  
-        {
-            emoji: "🔁",
-            type: "edit", // Pick a new pong variation
-            response: ["Pang!", "Peng!", "Ping!", "Pong!", "Pung!"]
-        }
-    ],
-    reactionButtonTimeout: 30000 // After 30 seconds, the buttons won't work anymore
-});
 
 bot.registerCommand("launches", async(msg, args)=>{
     var returnValue = {
@@ -55,21 +37,6 @@ bot.registerCommand("launches", async(msg, args)=>{
 
 
 });
-
-bot.registerCommand("embed", (msg, args)=>{
-    return {
-        embed: {
-            title: "Title",
-            description: "dscro[ttops",
-            fields: [
-                {
-                    name: "field one name",
-                    value: "<:launch_go:838417459115065344>"
-                }
-            ]
-        }
-    }
-})
 
 module.exports = {
     bot
