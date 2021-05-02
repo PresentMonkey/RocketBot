@@ -15,28 +15,16 @@ bot.on("ready", ()=>{
 
 
 bot.registerCommand("launches", async(msg, args)=>{
-    var returnValue = {
-        embed: {
-            title: "Next 10 Launches",
-            fields: []
-        }
-    };
-    var response = await l.get('/launch/upcoming/');
-    
-
-    
-    response.results.forEach((data)=>{
-        launchReturn = {
-            name: data.name,
-            value: data.pad.name + ", " +  data.pad.location.name + "\n" + data.status.name + " - "
-        }
-        returnValue.embed.fields.push(launchReturn);
-    })
-
-    return returnValue;
+    var response = await l.getLaunches();
+    return response;
 
 
 });
+
+bot.registerCommand("nextlaunch", async(msg, args)=>{
+    var response = await l.getNextLaunch();
+    return response;
+})
 
 module.exports = {
     bot
