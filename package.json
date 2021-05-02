@@ -1,0 +1,19 @@
+{
+  "name": "rocketbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cycle": "^1.0.3",
+    "dotenv": "^8.2.0",
+    "eris": "^0.15.0",
+    "redis": "^3.1.2",
+    "serialize-javascript": "^5.0.1"
+  }
+}
