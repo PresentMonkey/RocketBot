@@ -78,14 +78,21 @@ class LaunchLibrary{
             else{
                 var returnValue;
                 let response = await this.get('/launch/upcoming/');
-                let goLaunches = response.results.filter(launch => launch.status.name == "Go");
+                let goLaunches = response.results.filter(launch => launch.status.id == 1);
                 if(goLaunches){
                     let latestLaunch =  goLaunches[0];
                     let date = new Date(latestLaunch.net)
+                    let bodyText = `🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "short", hour12: false, hour: "numeric", minute: "numeric"})} UTC`;
+                    if(latestLaunch.probability){
+                        bodyText = bodyText + " | POG: " + latestLaunch.probability;
+                    }
+                    if(latestLaunch.vidURLs){
+                        bodyText = bodyText + `| [Webcast](${latestLaunch.vidURLs[0]}) `
+                    }
                     returnValue = {
                         embed: {
                             title: "Next Launch:",
-                            description: "🚀 " + latestLaunch.name + "\n📍 " + latestLaunch.pad.name + ", " + latestLaunch.pad.location.name + "\n🕒  " + date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "long", hour: "numeric", minute: "numeric"}),
+                            description: "**"+bodyText+"**",
                             footer: {
                                 text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
                             }
