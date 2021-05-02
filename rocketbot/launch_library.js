@@ -24,6 +24,8 @@ class LaunchLibrary{
             }
             else{
                 const response = await axios.get(this.url + path);
+                let date = response.headers.date;
+                response.data.retrivalDate = new Date(date);
                 redis_client.setex(path, 600 /*10 min cache time*/, serialize(response.data));
                 return response.data;
             }
@@ -46,7 +48,10 @@ class LaunchLibrary{
                 let returnValue = {
                     embed: {
                         title: "Next 10 Launches",
-                        fields: []
+                        fields: [],
+                        footer: {
+                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
+                        }
                     }
                 };
                 response.results.forEach((data)=>{
@@ -77,7 +82,10 @@ class LaunchLibrary{
                 let returnValue = {
                     embed: {
                         title: "Next Launch:",
-                        description: "🚀 " + latestLaunch.name + "\n📍 " + latestLaunch.pad.name + ", " + latestLaunch.pad.location.name + "\n🕒  " + date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "long", hour: "numeric", minute: "numeric"})
+                        description: "🚀 " + latestLaunch.name + "\n📍 " + latestLaunch.pad.name + ", " + latestLaunch.pad.location.name + "\n🕒  " + date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "long", hour: "numeric", minute: "numeric"}),
+                        footer: {
+                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC";
+                        }
                     }
                 };
                 redis_client.setex('getNextLaunch', 600, serialize(returnValue));
