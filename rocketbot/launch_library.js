@@ -91,7 +91,7 @@ class LaunchLibrary{
                 returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")});
                 returnValue.setMetadata({date: launchDate});
                 if(latestLaunch.probability){
-                    returnValue.appendDescription(` | POG: ${latestLaunch.probability}`);
+                    returnValue.appendDescription(` | PGO: ${latestLaunch.probability} `);
                 }
                 if(latestLaunch.vidURLs){
                     returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0].url})`)
