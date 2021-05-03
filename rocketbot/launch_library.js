@@ -83,8 +83,9 @@ class LaunchLibrary{
             });
             let response = await this.get('/launch/upcoming/');
             let goLaunches = response.results.filter(launch => launch.status.id == 1);
+            goLaunches = await this.get(`/launch/upcoming/${goLaunches[0].id}`);
             if(goLaunches){
-                let latestLaunch =  goLaunches[0];
+                let latestLaunch =  goLaunches;
                 let launchDate = DateTime.fromISO(latestLaunch.net)
                 returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM',' d ', ' H':'mm 'UTC'")}`);
                 returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")});
@@ -93,7 +94,7 @@ class LaunchLibrary{
                     returnValue.appendDescription(` | POG: ${latestLaunch.probability}`);
                 }
                 if(latestLaunch.vidURLs){
-                    returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0]}`)
+                    returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0].url})`)
                 }
                 returnValue.setDescriptionBold();
             }
