@@ -8,6 +8,7 @@ class Embed{
         this.color = 'color' in data ? data.color : null;
         this.fields = 'fields' in data ? data.fields : [];
         this.footer = 'footer' in data ? data.footer : null;
+        this.metadata = 'metadata' in data ? data.metadata : null;
     }
     setTitle(title){
         this.title = title;
@@ -24,6 +25,9 @@ class Embed{
     setFooter(footer){
         this.footer = footer;
     }
+    setMetadata(metadata){
+        this.metadata = metadata;
+    }
     appendTitle(text){
         this.title = this.title + text;
     }
@@ -33,6 +37,7 @@ class Embed{
     appendFields(field){
         this.fields.push(field);
     }
+    
     setDescriptionBold(){
         this.descriptionBold = true;
     }
@@ -49,6 +54,9 @@ class Embed{
                 footer: this.footer 
             }
         }
+    }
+    get meta(){
+        return this.metadata; 
     }
 }
 
