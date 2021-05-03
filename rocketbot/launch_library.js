@@ -1,6 +1,7 @@
 const axios = require('axios');
 const redis_client = require('./redis_client');
 const serialize = require('serialize-javascript');
+const {Embed} = require('./discord');
 
 function deserialize(serializedJavascript){
     return eval('(' + serializedJavascript + ')');
@@ -45,21 +46,19 @@ class LaunchLibrary{
             }
             else{
                 var response = await this.get('/launch/upcoming/');
-                let returnValue = {
-                    embed: {
-                        title: "Next 10 Launches",
-                        fields: [],
-                        footer: {
-                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
-                        }
+                let returnValue = new Embed({
+                    title: "Next 10 Launches",
+                    fields: [],
+                    footer: {
+                        text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
                     }
-                };
+                })
                 response.results.forEach((data)=>{
                     let launchReturn = {
                         name: data.name,
                         value: data.pad.name + ", " +  data.pad.location.name + "\n" + data.status.name + " - "
                     }
-                    returnValue.embed.fields.push(launchReturn);
+                    returnValue.appendFields(launchReturn);
                 });
                 redis_client.setex('getLaunches', 600, serialize(returnValue));
                 return returnValue;
@@ -82,33 +81,30 @@ class LaunchLibrary{
                 if(goLaunches){
                     let latestLaunch =  goLaunches[0];
                     let date = new Date(latestLaunch.net)
-                    let bodyText = `🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "short", hour12: false, hour: "numeric", minute: "numeric"})} UTC`;
+                    let returnValue = new Embed({
+                        title: "Next Launch",
+                        description: `🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${date.toLocaleString('en-us', {timeZone: 'UTC', month: 'long', day: 'numeric', weekday: "short", hour12: false, hour: "numeric", minute: "numeric"})} UTC`,
+                        footer: {
+                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
+                        }
+                    })
                     if(latestLaunch.probability){
-                        bodyText = bodyText + " | POG: " + latestLaunch.probability;
+                        returnValue.appendDescription(` | POG: ${latestLaunch.probability}`);
                     }
                     if(latestLaunch.vidURLs){
-                        bodyText = bodyText + `| [Webcast](${latestLaunch.vidURLs[0]}) `
+                        returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0]}`)
                     }
-                    returnValue = {
-                        embed: {
-                            title: "Next Launch:",
-                            description: "**"+bodyText+"**",
-                            footer: {
-                                text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
-                            }
-                        }
-                    };
+                    returnValue.setDescriptionBold();
+                    return returnValue;
                 }
                 else{
-                    returnValue = {
-                        embed: {
-                            title: "Next Launch: ",
-                            description: "No Go Launches at this time",
-                            footer: {
-                                text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
-                            }
+                    returnValue = new Embed({
+                        title: 'Next Launch',
+                        description: "No Go Launches at this time",
+                        footer: {
+                            text: "Retrived from thespacedevs.com at " + response.retrivalDate.toLocaleString('en-us', {timeZone: 'UTC', hour12: false ,hour: "numeric", minute: "numeric"}) + " UTC"
                         }
-                    }
+                    })
                 } 
                 redis_client.setex('getNextLaunch', 600, serialize(returnValue));
                 return returnValue;

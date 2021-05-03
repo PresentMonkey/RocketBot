@@ -16,14 +16,14 @@ bot.on("ready", ()=>{
 
 bot.registerCommand("launches", async(msg, args)=>{
     var response = await l.getLaunches();
-    return response;
+    return response.raw;
 
 
 });
 
 bot.registerCommand("nextlaunch", async(msg, args)=>{
     var response = await l.getNextLaunch();
-    return response;
+    return response.raw;
 })
 
 module.exports = {
