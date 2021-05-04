@@ -83,13 +83,21 @@ class LaunchLibrary{
             });
             let response = await this.get('/launch/upcoming/');
             let goLaunches = response.results.filter(launch => launch.status.id == 1);
-            goLaunches = await this.get(`/launch/upcoming/${goLaunches[0].id}`);
+            goLaunches = await this.get(`/launch/${goLaunches[0].id}`);
             if(goLaunches){
                 let latestLaunch =  goLaunches;
-                let launchDate = DateTime.fromISO(latestLaunch.net)
-                returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}`);
+                let launchDate = DateTime.fromISO(latestLaunch.net, {zone: 'utc'});
+                let line = [
+                    `🚀 ${latestLaunch.name}`,
+                    `📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})`,
+                    `🕒 [${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://www.inyourowntime.zone/${launchDate.toFormat("yyyy'-'LL'-'dd'_'HH'.'mm'_UTC'")})`
+                ]
+                //returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}`);
                 returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")});
                 returnValue.setMetadata({date: launchDate});
+                if(latestLaunch.rocket.launcher_stage[0].launcher.serial_number){
+                    line[0] = line[0] + ` | ${latestLaunch.rocket.launcher_stage[0].launcher.serial_number}`
+                }
                 if(latestLaunch.probability){
                     var weatherEmoji;
                     if(latestLaunch.probability <= 30){
@@ -101,11 +109,12 @@ class LaunchLibrary{
                     else{
                         weatherEmoji = config.PGO_emojis[latestLaunch.probability];
                     }
-                    returnValue.appendDescription(` | PGO: ${latestLaunch.probability}% ${weatherEmoji}`);
+                    line[2] = line[2] + ` | PGO: ${latestLaunch.probability}% ${weatherEmoji} `;
                 }
                 if(latestLaunch.vidURLs){
-                    returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0].url})`)
+                    line[2] = line[2] + `| [Webcast](${latestLaunch.vidURLs[0].url})`;
                 }
+                returnValue.setDescription(line[0] + '\n' + line[1] + '\n' + line[2]);
                 returnValue.setDescriptionBold();
             }
             else{
