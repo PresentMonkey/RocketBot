@@ -53,13 +53,13 @@ class LaunchLibrary{
                     title: "Next 10 Launches",
                     fields: [],
                     footer: {
-                        text: "Retrived from thespacedevs.com at " + response.retrivalDate.toFormat("H':'mm 'UTC'")
+                        text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'", {zone: 'UTC'})
                     }
                 })
                 response.results.forEach((data)=>{
                     let launchReturn = {
                         name: data.name,
-                        value: data.pad.name + ", " +  data.pad.location.name + "\n" + data.status.name + " - "
+                        value: data.pad.name + ", " +  data.pad.location.name + "\n" + data.status.name + " -"
                     }
                     returnValue.appendFields(launchReturn);
                 });
@@ -93,7 +93,7 @@ class LaunchLibrary{
                     `🕒 [${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://www.inyourowntime.zone/${launchDate.toFormat("yyyy'-'LL'-'dd'_'HH'.'mm'_UTC'")})`
                 ]
                 //returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}`);
-                returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")});
+                returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'", {zone: 'UTC'})});
                 returnValue.setMetadata({date: launchDate});
                 if(latestLaunch.rocket.launcher_stage[0].launcher.serial_number){
                     line[0] = line[0] + ` | ${latestLaunch.rocket.launcher_stage[0].launcher.serial_number}`
@@ -119,7 +119,7 @@ class LaunchLibrary{
             }
             else{
                 returnValue.setDescription("No Go Launches at this time");
-                returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")})
+                returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'", {zone: 'UTC'})})
             } 
             redis_client.setex('getNextLaunch', 600, serialize(returnValue));
             return returnValue;
