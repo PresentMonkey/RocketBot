@@ -2,6 +2,7 @@ const Eris = require('eris');
 const launch_library = require('./launch_library').LaunchLibrary;
 const l = new launch_library('https://ll.thespacedevs.com/2.0.0');
 const {DateTime, Duration}=require('luxon');
+const config = require('../config');
 
 const bot = new Eris.CommandClient(process.env.DISCORD_BOT_TOKEN, {}, {
     description: "Rocket Bot",

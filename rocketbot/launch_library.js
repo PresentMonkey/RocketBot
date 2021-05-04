@@ -3,7 +3,7 @@ const redis_client = require('./redis_client');
 const serialize = require('serialize-javascript');
 const {Embed} = require('./discord');
 const {DateTime, Duration}=require('luxon');
-
+const config = require('../config');
 
 
 function deserialize(serializedJavascript){
@@ -87,11 +87,21 @@ class LaunchLibrary{
             if(goLaunches){
                 let latestLaunch =  goLaunches;
                 let launchDate = DateTime.fromISO(latestLaunch.net)
-                returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM',' d ', ' H':'mm 'UTC'")}`);
+                returnValue.setDescription(`🚀 ${latestLaunch.name}\n📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})\n🕒 ${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}`);
                 returnValue.setFooter({text: "Retrived from thespacedevs.com at " + DateTime.fromISO(response.retrivalDate).toFormat("H':'mm 'UTC'")});
                 returnValue.setMetadata({date: launchDate});
                 if(latestLaunch.probability){
-                    returnValue.appendDescription(` | PGO: ${latestLaunch.probability} `);
+                    var weatherEmoji;
+                    if(latestLaunch.probability <= 30){
+                        weatherEmoji = config.PGO_emojis[30];
+                    }
+                    if(latestLaunch.probability >= 90){
+                        weatherEmoji = config.PGO_emojis[90];
+                    }
+                    else{
+                        weatherEmoji = config.PGO_emojis[latestLaunch.probability];
+                    }
+                    returnValue.appendDescription(` | PGO: ${latestLaunch.probability}% ${weatherEmoji}`);
                 }
                 if(latestLaunch.vidURLs){
                     returnValue.appendDescription(`| [Webcast](${latestLaunch.vidURLs[0].url})`)
