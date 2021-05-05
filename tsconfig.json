@@ -1,0 +1,5 @@
+{
+    "extends": "@tsconfig/node10/tsconfig.json",
+    "include": ["server.js", "rocketbot/**/*"],
+    "exclude": ["node_modules"]
+}
