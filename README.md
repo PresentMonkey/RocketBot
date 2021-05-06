@@ -10,4 +10,4 @@ Finally run `node server.js`
 
 ###
 
-Early code, don't judge..
+Early code, subject to change
