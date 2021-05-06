@@ -1,49 +1,48 @@
-class Embed{
-    constructor(data){
+class Embed {
+    constructor(data) {
         this.setup(data);
     }
-    setup(data){
+    setup(data) {
         this.title = 'title' in data ? data.title : 'Title';
-        this.description = 'description' in data ? data.description: null;
+        this.description = 'description' in data ? data.description : null;
         this.color = 'color' in data ? data.color : null;
         this.fields = 'fields' in data ? data.fields : [];
         this.footer = 'footer' in data ? data.footer : null;
         this.metadata = 'metadata' in data ? data.metadata : null;
     }
-    setTitle(title){
+    setTitle(title) {
         this.title = title;
     }
-    setDescription(description){
+    setDescription(description) {
         this.description = description;
     }
-    setColor(color){
+    setColor(color) {
         this.color = color;
     }
-    setFields(fields){
+    setFields(fields) {
         this.fields = fields;
     }
-    setFooter(footer){
+    setFooter(footer) {
         this.footer = footer;
     }
-    setMetadata(metadata){
+    setMetadata(metadata) {
         this.metadata = metadata;
     }
-    appendTitle(text){
+    appendTitle(text) {
         this.title = this.title + text;
     }
-    appendDescription(text){
+    appendDescription(text) {
         this.description = this.description + text;
     }
-    appendFields(field){
+    appendFields(field) {
         this.fields.push(field);
     }
-    
-    setDescriptionBold(){
+    setDescriptionBold() {
         this.descriptionBold = true;
     }
-    get raw(){
-        if(this.descriptionBold){
-            var description = `**${this.description}**`
+    get raw() {
+        if (this.descriptionBold) {
+            var description = `**${this.description}**`;
         }
         return {
             embed: {
@@ -51,19 +50,14 @@ class Embed{
                 description: description,
                 fields: this.fields,
                 color: this.color,
-                footer: this.footer 
+                footer: this.footer
             }
-        }
+        };
     }
-    get meta(){
-        return this.metadata; 
+    get meta() {
+        return this.metadata;
     }
 }
-
-
-
-
-
 module.exports = {
     Embed
-}
+};

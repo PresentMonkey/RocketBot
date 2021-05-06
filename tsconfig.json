@@ -1,5 +1,8 @@
 {
-    "extends": "@tsconfig/node10/tsconfig.json",
-    "include": ["server.js", "rocketbot/**/*"],
-    "exclude": ["node_modules"]
-}
+    "compilerOptions": {
+      "outDir": "./built",
+      "allowJs": true,
+      "target": "esnext"
+    },
+    "include": ["./modules/**/*", "modules", "server.js", "config.js"]
+  }
