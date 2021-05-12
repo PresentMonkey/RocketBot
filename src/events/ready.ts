@@ -63,7 +63,7 @@ import {
       await upsertSlashCommands(globalCommands).catch(log.info);
     }
 
-    rest.eventHandlers.error = console.log;
+    //rest.eventHandlers.error = console.log;
 
     // GUILD COMMANDS WILL UPDATE INSTANTLY
     await Promise.all(
