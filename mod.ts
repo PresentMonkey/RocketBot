@@ -19,6 +19,7 @@ await Promise.all(
     "./src/tasks",
     "./src/permissionLevels",
     "./src/events",
+    "./src/launchLibrary"
   ].map((path) => importDirectory(Deno.realPathSync(path))),
 );
 await fileLoader();

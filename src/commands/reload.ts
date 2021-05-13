@@ -9,7 +9,8 @@ import { clearTasks, registerTasks } from "../utils/task_helper.ts";
 import { bot } from "../../cache.ts";
 
 const folderPaths = new Map([
- // ["arguments", "./src/arguments"],
+  // ["arguments", "./src/arguments"],
+  ["launchLibrary", "./src/launchLibrary"],
   ["commands", "./src/commands"],
   ["events", "./src/events"],
   ["inhibitors", "./src/inhibitors"],
@@ -27,12 +28,13 @@ createCommand({
       name: "folder",
       type: "string",
       literals: [
-    //    "arguments",
+        //    "arguments",
         "commands",
         "events",
         "inhibitors",
         "monitors",
         "tasks",
+        "launchlibrary",
       ],
       required: false,
     },
