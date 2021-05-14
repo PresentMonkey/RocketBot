@@ -7,6 +7,7 @@
         "request": "launch",
         "cwd": "${workspaceFolder}",
         "runtimeExecutable": "deno",
+        "outputCapture": "std",
         "runtimeArgs": ["run", "--inspect-brk", "-A", "mod.ts"],
         "attachSimplePort": 9229
       }
