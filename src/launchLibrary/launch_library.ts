@@ -36,11 +36,11 @@ export class LaunchLibrary {
             const line = [
                 `🚀 ${latestLaunch.name}`,
                 `📍 [${latestLaunch.pad.name}, ${latestLaunch.pad.location.name}](${latestLaunch.pad.wiki_url})`,
-                `🕒 [${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://www.inyourowntime.zone/${launchDate.toFormat("y-LL-dd_HH.mm_'UTC'")})`,
+                `🕒 [${launchDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://dateful.com/eventlink/e/?iso=${launchDate.toISO()}&title=${encodeURI(latestLaunch.name)})`,
                 ``,
                 `${difference}`
             ]
-            if(latestLaunch.rocket.launcher_stage[0].launcher.serial_number !== undefined){ //Check for booster serial number (SpaceX only)
+            if(latestLaunch.rocket.launcher_stage[0] !== undefined){ //Check for booster serial number (SpaceX only)
                 line[0] += ` | ${latestLaunch.rocket.launcher_stage[0].launcher.serial_number}`
             }
             if(latestLaunch.probability !== undefined && latestLaunch.probability !== null){
@@ -76,9 +76,33 @@ export class LaunchLibrary {
     static async nextLaunches(): Promise<Embed>{
         const response = await this.get('/launch/upcoming');
         const returnEmbed = new Embed()
-            .setTitle("Next 10 Launches")
+            .setTitle("Next 10 Launches:")
             .setFooter(`Retrived from thespacedevs.com at ${DateTime.fromISO(response.retrivalDate, {setZone: true}).toFormat("H':'mm 'UTC'")}`)
         response.results.forEach((data:any)=>{
+            var goEmoji: string;
+            switch(data.status.id){
+                case 1:
+                    goEmoji = "🟢"; //Go for launch
+                    break;
+                case 2: 
+                    goEmoji = "⚪"; //TBD 
+                    break;
+                case 3: 
+                    goEmoji = "✅"; //Successful launch
+                    break;
+                case 4:
+                    goEmoji = "❌"; //Launch fail
+                    break;
+                case 5:
+                    goEmoji = "🟡"; //Hold
+                    break;
+                case 6:
+                    goEmoji = "🚀"; //In flight
+                    break;
+
+
+                    
+            }
             returnEmbed.addField(
                 data.name,
                 `${data.pad.name}, ${data.pad.location.name} \n${data.status.name}`
