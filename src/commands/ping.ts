@@ -1,6 +1,4 @@
 import {
-    avatarURL,
-    DiscordApplicationCommandOptionTypes,
     DiscordInteractionResponseTypes,
     sendInteractionResponse,
     snowflakeToBigint,

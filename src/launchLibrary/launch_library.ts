@@ -3,9 +3,8 @@ import { Embed } from '../utils/Embed.ts';
 import { configs } from '../../configs.ts';
 import {pgoEmojis} from '../utils/constants/PGO_emojis.ts';
 import launchType from './types/launch.ts';
+import {DateTime} from '../../deps.ts';
 
-// @deno-types="https://esm.sh/@types/luxon/index.d.ts"
-import {DateTime} from 'https://esm.sh/luxon';
 
 const launchLibraryUrl = "https://ll.thespacedevs.com/2.2.0";
 export class LaunchLibrary {

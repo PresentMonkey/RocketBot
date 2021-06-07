@@ -1,10 +1,8 @@
 import {
-    DiscordApplicationCommandOptionTypes,
     DiscordInteractionResponseTypes,
     sendInteractionResponse,
     snowflakeToBigint,
   } from "../../deps.ts";
-import { cache } from "../../deps.ts";
 import { createCommand } from "../utils/helpers.ts";
 import { LaunchLibrary } from "../launchLibrary/launch_library.ts"
 
