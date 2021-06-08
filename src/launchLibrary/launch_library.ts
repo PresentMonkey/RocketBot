@@ -40,10 +40,10 @@ export class LaunchLibrary {
                 ``,
                 `${difference}`
             ]
-            if(latestLaunch.rocket.launcher_stage[0] !== undefined){ //Check for booster serial number (SpaceX only)
+            if(latestLaunch.rocket.launcher_stage[0]?.launcher?.serial_number !== undefined){ //Check for booster serial number (SpaceX only)
                 line[0] += ` | ${latestLaunch.rocket.launcher_stage[0].launcher.serial_number}`
             }
-            if(latestLaunch.probability !== undefined && latestLaunch.probability !== null){
+            if(latestLaunch.probability !== undefined && latestLaunch.probability !== null && latestLaunch.probability >= 0){
                 var emoji: string;
                 if(latestLaunch.probability <= 30){
                     emoji = pgoEmojis[30];
@@ -79,7 +79,7 @@ export class LaunchLibrary {
             .setTitle("Next 10 Launches:")
             .setFooter(`Retrived from thespacedevs.com at ${DateTime.fromISO(response.retrivalDate, {setZone: true}).toFormat("H':'mm 'UTC'")}`)
         response.results.forEach((data:any)=>{
-            var goEmoji: string;
+            var goEmoji= " ";
             switch(data.status.id){
                 case 1:
                     goEmoji = "🟢"; //Go for launch
@@ -99,12 +99,15 @@ export class LaunchLibrary {
                 case 6:
                     goEmoji = "🚀"; //In flight
                     break;
-
-
-                    
+                case 7:
+                    goEmoji = "🚀❌"; //Patrial Failure
+                    break;
+                case 8: 
+                    goEmoji = "⚪"; //TBC (to be confirmed)
+                    break;  
             }
             returnEmbed.addField(
-                data.name,
+                `${goEmoji} ${data.name}`,
                 `${data.pad.name}, ${data.pad.location.name} \n${data.status.name}`
             )
         })
