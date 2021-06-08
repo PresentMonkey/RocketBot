@@ -4,7 +4,7 @@ import { configs } from '../../configs.ts';
 import {pgoEmojis} from '../utils/constants/PGO_emojis.ts';
 import launchType from './types/launch.ts';
 import {DateTime} from '../../deps.ts';
-
+import {status_emojis} from '../utils/constants/status_emojis.ts';
 
 const launchLibraryUrl = "https://ll.thespacedevs.com/2.2.0";
 export class LaunchLibrary {
@@ -79,33 +79,7 @@ export class LaunchLibrary {
             .setTitle("Next 10 Launches:")
             .setFooter(`Retrived from thespacedevs.com at ${DateTime.fromISO(response.retrivalDate, {setZone: true}).toFormat("H':'mm 'UTC'")}`)
         response.results.forEach((data:any)=>{
-            var goEmoji= " ";
-            switch(data.status.id){
-                case 1:
-                    goEmoji = "🟢"; //Go for launch
-                    break;
-                case 2: 
-                    goEmoji = "⚪"; //TBD 
-                    break;
-                case 3: 
-                    goEmoji = "✅"; //Successful launch
-                    break;
-                case 4:
-                    goEmoji = "❌"; //Launch fail
-                    break;
-                case 5:
-                    goEmoji = "🟡"; //Hold
-                    break;
-                case 6:
-                    goEmoji = "🚀"; //In flight
-                    break;
-                case 7:
-                    goEmoji = "🚀❌"; //Patrial Failure
-                    break;
-                case 8: 
-                    goEmoji = "⚪"; //TBC (to be confirmed)
-                    break;  
-            }
+            var goEmoji= status_emojis[data.status.id];
             returnEmbed.addField(
                 `${goEmoji} ${data.name}`,
                 `${data.pad.name}, ${data.pad.location.name} \n${data.status.name}`
