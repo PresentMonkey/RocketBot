@@ -18,6 +18,11 @@ import {
   sendMessage,
   snowflakeToBigint,
   ws,
+  DiscordInteractionResponseTypes,
+  editSlashResponse,
+  Interaction,
+  DiscordenoMember,
+  deleteSlashResponse,
 } from "../../deps.ts";
 import { ArgumentDefinition, Command } from "../types/commands.ts";
 import { needButton, needMessage, needReaction } from "./collectors.ts";
@@ -485,6 +490,275 @@ export async function createEmbedsButtonsPagination(
         },
       }
     ).catch(log.error);
+  }
+}
+export async function createInteractionPagination(
+    interaction: Omit<Interaction, "member">,
+    member: DiscordenoMember,
+    embeds: Embed[],
+    page = 1,
+  ): Promise<void> {
+  if (embeds.length === 0) {
+    return;
+  }
+
+  let currentPage: number = page - 1;
+
+  if (currentPage < 0) {
+    currentPage = 0;
+  } else if (currentPage > embeds.length - 1) {
+    currentPage = embeds.length - 1;
+  }
+
+  const createComponents = (): MessageComponents => [
+    {
+      type: DiscordMessageComponentTypes.ActionRow,
+      components: [
+        {
+          type: DiscordMessageComponentTypes.Button,
+          label: "Previous",
+          customId: `${interaction.id}-Previous`,
+          style: DiscordButtonStyles.Primary,
+          disabled: currentPage === 0,
+        },
+        {
+          type: DiscordMessageComponentTypes.Button,
+          label: "Jump",
+          customId: `${interaction.id}-Jump`,
+          style: DiscordButtonStyles.Primary,
+          disabled: (embeds.length - 1) <= 2,
+        },
+        {
+          type: DiscordMessageComponentTypes.Button,
+          label: "Next",
+          customId: `${interaction.id}-Next`,
+          style: DiscordButtonStyles.Primary,
+          disabled: currentPage >= (embeds.length - 1),
+        }
+      ],
+    },
+  ];
+
+  await sendInteractionResponse(
+      snowflakeToBigint(interaction.id),
+      interaction.token,
+      {
+        type: DiscordInteractionResponseTypes.DeferredChannelMessageWithSource
+      }
+  ).catch(log.warn);
+
+  let embedMessage = await editSlashResponse(
+      interaction.token,
+      {
+        embeds: [embeds[currentPage]],
+        components: embeds.length === 1 ? undefined : await createComponents()
+      }
+  ).catch(log.warn);
+
+  if (!embedMessage) {
+    return;
+  }
+
+  if (embeds.length <= 1) {
+    return;
+  }
+
+  while (true) {
+    const collectedButton = await needButton(member.id, snowflakeToBigint(interaction.id), {
+      duration: 30 * 1000,
+    }).catch(log.error);
+
+    if (!collectedButton || !collectedButton.customId.startsWith(interaction.id.toString())) {
+      return;
+    }
+
+    const action = collectedButton.customId.split("-")[1];
+
+    switch (action) {
+      case "Next":
+        currentPage++;
+        break;
+      case "Jump": {
+        await sendInteractionResponse(
+            snowflakeToBigint(collectedButton.interaction.id),
+            collectedButton.interaction.token,
+            {
+              type: DiscordInteractionResponseTypes.ChannelMessageWithSource,
+              data: {
+                content: "To what page would you like to jump? Say `cancel` or `0` to cancel the prompt."
+              }
+            }
+        ).catch(log.warn);
+        const answer = await needMessage(member.id, snowflakeToBigint(interaction.channelId!));
+        await deleteMessage(snowflakeToBigint(interaction.channelId!), answer.id).catch(log.error);
+        await deleteSlashResponse(collectedButton.interaction.token);
+
+        const newPageNumber = Math.ceil(Number(answer.content));
+
+        if (isNaN(newPageNumber) || newPageNumber < 1 || newPageNumber > (embeds.length - 1)) {
+          continue;
+        }
+
+        currentPage = newPageNumber;
+
+        editSlashResponse(
+            interaction.token,
+            {
+              embeds: [embeds[currentPage]],
+              content: "",
+              components: await createComponents()
+            }
+        ).catch(log.warn);
+
+        continue;
+      }
+      case "Previous":
+        currentPage--;
+        break;
+    }
+
+    if (currentPage < 0) {
+      currentPage = 0;
+    }
+
+    if (currentPage > embeds.length - 1) {
+      currentPage = embeds.length - 1;
+    }
+
+    if (!embedMessage) {
+      return;
+    }
+
+    await sendInteractionResponse(
+        snowflakeToBigint(collectedButton.interaction.id),
+        collectedButton.interaction.token,
+        {
+          type: 7,
+          data: {
+            embeds: [embeds[currentPage]],
+            components: await createComponents(),
+          },
+        }
+    ).catch(log.error)
+  }
+}
+
+export async function createInteractionDatabaseButtonPagination(
+    interaction: Omit<Interaction, "member">,
+    member: DiscordenoMember,
+    getEmbedCount: () => Promise<number>,
+    /*getNoneEmbed: () => Promise<Embed | undefined>,*/
+    getEmbed: (embedPage: number, max_page: number) => Promise<Embed>,
+    page = 1,
+  ): Promise<void> {
+  await sendInteractionResponse(
+      snowflakeToBigint(interaction.id),
+      interaction.token,
+      {
+        type: DiscordInteractionResponseTypes.DeferredChannelMessageWithSource
+      }
+  ).catch(log.warn);
+
+  let currentPage = page;
+
+  const createComponents = async (): Promise<MessageComponents> => [
+    {
+      type: DiscordMessageComponentTypes.ActionRow,
+      components: [
+        {
+          type: DiscordMessageComponentTypes.Button,
+          label: "❮",
+          //emoji: "❮",
+          customId: `${interaction.id}-Previous`,
+          style: DiscordButtonStyles.Primary,
+          disabled: currentPage === 1,
+          
+        },
+        {
+          type: DiscordMessageComponentTypes.Button,
+          label: "❯",
+          //emoji: "❯",
+          customId: `${interaction.id}-Next`,
+          style: DiscordButtonStyles.Primary,
+          disabled: currentPage >= (await getEmbedCount()),
+          
+        }
+      ],
+    },
+  ];
+
+  const embedCount = Number(await getEmbedCount());
+  /*
+  if (embedCount === 0) {
+    const noneEmbed = await getNoneEmbed();
+    if (noneEmbed) {
+      await editSlashResponse(
+          interaction.token,
+          {
+            embeds: [noneEmbed]
+          }
+      ).catch(log.warn);
+    }
+    return;
+  }
+  */
+  if (page > embedCount) {
+    return;
+  }
+
+  const currentEmbed = await getEmbed(currentPage, embedCount);
+  await editSlashResponse(
+      interaction.token,
+      {
+        embeds: [currentEmbed],
+        components: await createComponents()
+      }
+  ).catch(log.warn);
+
+  if (embedCount === 1) {
+    return;
+  }
+
+  while (true) {
+    const collectedButton = await needButton(member.id, snowflakeToBigint(interaction.id), {
+      duration: 2 * 60,
+    }).catch(log.error);
+
+    if (!collectedButton || !collectedButton.customId.startsWith(interaction.id.toString())) {
+      return;
+    }
+
+    const action = collectedButton.customId.split("-")[1];
+
+    switch (action) {
+      case "Next":
+        currentPage++;
+        break;
+      case "Previous":
+        currentPage--;
+        break;
+    }
+
+    if (currentPage < 1) {
+      currentPage = 1;
+    }
+
+    if (currentPage > embedCount) {
+      currentPage = embedCount;
+    }
+
+    await sendInteractionResponse(
+        snowflakeToBigint(collectedButton.interaction.id),
+        collectedButton.interaction.token,
+        {
+          type: 7,
+          data: {
+            embeds: [await getEmbed(currentPage, embedCount)],
+            content: "",
+            components: await createComponents()
+          }
+        },
+    ).catch(log.warn);
   }
 }
 

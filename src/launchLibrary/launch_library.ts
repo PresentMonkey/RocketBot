@@ -88,5 +88,48 @@ export class LaunchLibrary {
         return returnEmbed;
     }
 
+    static async nextEvent(index = 0, totalCount?: number): Promise<Embed>{
+        const response = await LaunchLibrary.get('/event/upcoming');
+        const event = response.results[index-1];
+        const returnEmbed = new Embed()
+        if(index == 1){
+            returnEmbed.setTitle("Next Event");
+        }
+        else{
+            returnEmbed.setTitle(`Next Event (${index}/${totalCount})`);
+        }
+        const eventDate = DateTime.fromISO(event.date, {zone: 'utc'});
+        const difference = eventDate.diffNow().toFormat("'In 'd' days, ' h ' hours, and ' m ' minutes.' ");
+        const line = [
+            `${event.name}`,
+            ``,
+            `🕒 [${eventDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://dateful.com/eventlink/e/?iso=${eventDate.toISO()}&title=${encodeURI(event.name)})`,
+            ``,
+            `${difference}`
+        ]
+        if(event.news_url !== undefined && event.news_url !== null){
+            line[1] += `[News](${event.news_url}) `
+        }
+        if(event.video_url !== undefined && event.video_url !== null){
+            if(line[1].length > 1){
+                line[1] += `| [Video](${event.video_url}) `
+            }
+            else{
+                line[1] += `[Video](${event.video_url}) `
+            }
+        }
+        
+        if(event.feature_image !== undefined && event.feature_image !== null){
+            returnEmbed.setThumbnail(event.feature_image);
+        }
+        returnEmbed.setDescription('**'+line[0] + '\n' + line[1] + '\n' + line[2]+ '\n' + line[3] + '\n' + line[4] +"**")
+        return returnEmbed;
+    
+    }
+    static async nextEventMax(){
+        const response = await LaunchLibrary.get('/event/upcoming');
+        return response.results.length;
+
+    }
 
 }
