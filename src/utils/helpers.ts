@@ -547,7 +547,7 @@ export async function createInteractionPagination(
       }
   ).catch(log.warn);
 
-  let embedMessage = await editSlashResponse(
+  const embedMessage = await editSlashResponse(
       interaction.token,
       {
         embeds: [embeds[currentPage]],

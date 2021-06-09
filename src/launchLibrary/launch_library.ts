@@ -102,7 +102,7 @@ export class LaunchLibrary {
         const difference = eventDate.diffNow().toFormat("'In 'd' days, ' h ' hours, and ' m ' minutes.' ");
         const line = [
             `${event.name}`,
-            ``,
+            `ℹ️ `,
             `🕒 [${eventDate.toFormat("ccc',' MMMM' ' d ', ' H':'mm 'UTC'")}](https://dateful.com/eventlink/e/?iso=${eventDate.toISO()}&title=${encodeURI(event.name)})`,
             ``,
             `${difference}`
